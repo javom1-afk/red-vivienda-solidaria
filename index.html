@@ -187,6 +187,19 @@
     background:var(--white);
   }
   .card.need{border-left-color:var(--amber);}
+  .card.unavailable{ opacity:.55; border-left-color:#9aa3b8; }
+  .status-badge{
+    font-size:10px; font-weight:800; text-transform:uppercase;
+    color:#6b7590; letter-spacing:.04em; background:#eceef3;
+    padding:3px 7px; border-radius:3px;
+  }
+  .card-actions{ display:flex; justify-content:flex-end; align-items:center; gap:14px; margin-top:10px; }
+  .btn-unavail{
+    font-size:11.5px; font-weight:700; padding:6px 11px;
+    border:1px solid var(--line); border-radius:4px; background:var(--paper);
+    color:var(--blue-deep); cursor:pointer;
+  }
+  .link-delete{ font-size:11.5px; color:#c1652b; text-decoration:underline; cursor:pointer; }
   .card-top{
     display:flex; justify-content:space-between; align-items:flex-start; gap:10px;
   }
@@ -440,7 +453,7 @@ async function loadEntries(){
       id: row.id, type: row.type, name: row.name,
       zoneGen: row.zonegen, zone: row.zone, spaceType: row.spacetype,
       modality: row.modality, duration: row.duration, value: row.value,
-      furnished: row.furnished,
+      furnished: row.furnished, status: row.status || 'active',
       desc: row.description, photos: row.photos, date: row.date
     }));
   }catch(e){
@@ -482,6 +495,7 @@ async function publish(){
     duration,
     value: modality === 'Alquiler' ? value : '',
     furnished: mode === 'offer' ? furnished : '',
+    status: 'active',
     description: desc,
     photos,
     date: new Date().toISOString()
@@ -532,11 +546,12 @@ function render(){
   const toDisplay = shown.slice(0, visibleCount);
 
   list.innerHTML = toDisplay.map(e => `
-    <div class="card ${e.type}">
+    <div class="card ${e.type}${e.status==='unavailable' ? ' unavailable' : ''}">
       <div class="card-top">
         <span class="tag">${e.type==='offer' ? 'Ofrece espacio' : 'Necesita espacio'}</span>
         <span class="card-zone">${escapeHtml(e.zoneGen || '')}${e.zone ? ' · ' + escapeHtml(e.zone) : ''}</span>
       </div>
+      ${e.status==='unavailable' ? '<div style="margin-top:6px;"><span class="status-badge">No disponible</span></div>' : ''}
       <div class="card-contact"><span class="lbl">Contacto</span>${escapeHtml(e.name)}</div>
       <div class="card-highlights">
         ${e.spaceType ? `<span class="hl-pill">${escapeHtml(e.spaceType)}</span>` : ''}
@@ -548,8 +563,9 @@ function render(){
       </div>
       <p class="card-desc">${escapeHtml(e.desc)}</p>
       ${e.photos ? `<p class="card-desc"><a href="${escapeHtml(e.photos)}" target="_blank" rel="noopener" style="color:var(--blue-deep); font-weight:700;">Ver fotos →</a></p>` : ''}
-      <div style="margin-top:10px; text-align:right;">
-        <a href="#" onclick="removeEntry('${e.id}'); return false;" style="font-size:11.5px; color:#9aa3b8; text-decoration:underline;">Ya no disponible — eliminar</a>
+      <div class="card-actions">
+        <a class="link-delete" onclick="removeEntry('${e.id}')">Eliminar</a>
+        <button class="btn-unavail" onclick="toggleAvailability('${e.id}', '${e.status || 'active'}')">${e.status==='unavailable' ? 'Marcar como disponible' : 'Marcar como no disponible'}</button>
       </div>
     </div>
   `).join('');
@@ -562,6 +578,18 @@ function render(){
 function loadMore(){
   visibleCount += PAGE_SIZE;
   render();
+}
+
+async function toggleAvailability(id, currentStatus){
+  const newStatus = currentStatus === 'unavailable' ? 'active' : 'unavailable';
+  try{
+    const { error } = await supabaseClient.from('entries').update({ status: newStatus }).eq('id', id);
+    if(error) throw error;
+    await loadEntries();
+  }catch(e){
+    console.error('Error actualizando estado:', e);
+    alert('No se pudo actualizar. Intenta de nuevo.');
+  }
 }
 
 async function removeEntry(id){
