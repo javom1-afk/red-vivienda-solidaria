@@ -379,8 +379,9 @@
         <option value="Occidente / Ladera">Occidente / Ladera</option>
         <option value="Centro">Centro</option>
       </select>
-      <input id="fltMaxValue" class="full" type="number" placeholder="Si buscas arriendo: precio máximo (COP)" oninput="filterChanged()">
+      <input id="fltMaxValue" class="full" type="text" inputmode="numeric" placeholder="Si buscas arriendo: precio máximo (COP)" oninput="formatPriceInput(this)" onkeydown="if(event.key==='Enter'){filterChanged();}">
     </div>
+    <button class="submit" style="margin-top:0; margin-bottom:16px;" onclick="filterChanged()">Buscar</button>
     <div id="list"></div>
   </div>
 
@@ -431,6 +432,11 @@ function setMode(m){
 function toggleValueField(){
   const modality = document.getElementById('fModality').value;
   document.getElementById('valueWrap').style.display = modality === 'Alquiler' ? 'grid' : 'none';
+}
+
+function formatPriceInput(el){
+  const digits = el.value.replace(/\D/g, '');
+  el.value = digits ? Number(digits).toLocaleString('es-CO') : '';
 }
 
 function filterChanged(){
@@ -528,7 +534,8 @@ function render(){
 
   const fSpaceType = document.getElementById('fltSpaceType').value;
   const fZone = document.getElementById('fltZone').value;
-  const fMaxValue = parseFloat(document.getElementById('fltMaxValue').value);
+  const fMaxValueRaw = document.getElementById('fltMaxValue').value.replace(/\D/g, '');
+  const fMaxValue = fMaxValueRaw ? parseFloat(fMaxValueRaw) : NaN;
 
   let shown = filter==='all' ? entries : entries.filter(e=>e.type===filter);
   if(freeOnly) shown = shown.filter(e=>e.modality==='Préstamo temporal');
