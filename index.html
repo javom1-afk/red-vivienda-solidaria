@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cali Te Acoge — Red de Vivienda Solidaria</title>
+<style>
+  :root{
+    --blue:#0033A0;
+    --blue-deep:#00206b;
+    --green:#009739;
+    --green-deep:#006b28;
+    --red:#CE1126;
+    --ink:#122036;
+    --paper:#f5f7fb;
+    --line:#dbe2ee;
+    --white:#ffffff;
+    --amber:#c1652b;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    font-family:'Helvetica Neue',Arial,sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    min-height:100vh;
+  }
+  .flagbar{ height:8px; display:flex; }
+  .flagbar span{ flex:1; }
+  .flagbar .b{ background:var(--blue); }
+  .flagbar .r{ background:var(--red); flex:0.35; }
+  .flagbar .w{ background:var(--white); }
+  .flagbar .g{ background:var(--green); }
+
+  .wrap{max-width:760px; margin:0 auto; padding:28px 20px 40px;}
+
+  header{
+    padding-bottom:20px;
+    margin-bottom:24px;
+    border-bottom:2px solid var(--line);
+  }
+  .badge-row{display:flex; align-items:center; gap:10px; margin-bottom:14px;}
+  .heart-icon{ flex-shrink:0; }
+  .eyebrow{
+    font-size:12px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--blue);
+    font-weight:700;
+  }
+  h1{
+    font-size:30px;
+    line-height:1.15;
+    color:var(--blue-deep);
+    font-weight:800;
+    letter-spacing:-.01em;
+  }
+  .slogan{
+    display:inline-block;
+    margin-top:8px;
+    font-size:14px;
+    font-weight:700;
+    color:var(--green-deep);
+    background:#e7f6ec;
+    border:1px solid #bfe6cb;
+    padding:4px 12px;
+    border-radius:20px;
+  }
+  .sub{
+    font-size:14.5px;
+    color:#54607a;
+    margin-top:12px;
+    max-width:58ch;
+    line-height:1.5;
+  }
+
+  .stats{
+    display:flex; gap:14px; margin-top:18px; flex-wrap:wrap;
+  }
+  .stat{
+    background:var(--white);
+    border:1px solid var(--line);
+    border-top:3px solid var(--blue);
+    border-radius:4px;
+    padding:8px 14px;
+    font-size:13px;
+    color:var(--blue-deep);
+  }
+  .stat.g{ border-top-color:var(--green); color:var(--green-deep); }
+  .stat b{font-size:19px; display:block; font-weight:800;}
+
+  .panel{
+    background:var(--white);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:22px;
+    margin-bottom:24px;
+  }
+  .panel h2{
+    font-size:16.5px;
+    color:var(--blue-deep);
+    margin-bottom:14px;
+    font-weight:800;
+    display:flex; align-items:center; gap:8px;
+  }
+
+  .toggle{
+    display:flex; gap:8px; margin-bottom:16px;
+  }
+  .toggle button{
+    flex:1;
+    padding:10px;
+    border:1px solid var(--line);
+    background:var(--paper);
+    color:var(--ink);
+    font-size:13.5px;
+    font-weight:700;
+    border-radius:4px;
+    cursor:pointer;
+  }
+  .toggle button.active.offer{background:var(--blue); border-color:var(--blue); color:var(--white);}
+  .toggle button.active.need{background:var(--amber); border-color:var(--amber); color:var(--white);}
+
+  label{
+    display:block;
+    font-size:12px;
+    color:#5c6883;
+    margin:14px 0 5px;
+    font-weight:700;
+  }
+  input, select, textarea{
+    width:100%;
+    font-family:inherit;
+    font-size:14.5px;
+    padding:10px 11px;
+    border:1px solid var(--line);
+    border-radius:4px;
+    background:var(--paper);
+    color:var(--ink);
+  }
+  textarea{resize:vertical; min-height:64px;}
+  .row2{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+  .row3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px;}
+
+  .submit{
+    margin-top:20px;
+    width:100%;
+    padding:13px;
+    background:var(--blue-deep);
+    color:var(--white);
+    border:none;
+    border-radius:4px;
+    font-weight:800;
+    font-size:14.5px;
+    letter-spacing:.02em;
+    cursor:pointer;
+  }
+  .submit:disabled{opacity:.5; cursor:default;}
+
+  .filters{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+    margin-bottom:16px;
+  }
+  .filters .full{ grid-column:1 / -1; }
+  .filters select, .filters input{ font-size:13px; padding:8px 10px; }
+
+  .chiprow{ display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap; }
+  .chip{
+    padding:6px 13px;
+    border:1px solid var(--line);
+    border-radius:20px;
+    background:var(--paper);
+    font-size:12.5px;
+    font-weight:700;
+    cursor:pointer;
+    color:#54607a;
+  }
+  .chip.active{background:var(--blue-deep); color:var(--white); border-color:var(--blue-deep);}
+
+  .card{
+    border:1px solid var(--line);
+    border-left:4px solid var(--blue);
+    border-radius:4px;
+    padding:16px 18px;
+    margin-bottom:12px;
+    background:var(--white);
+  }
+  .card.need{border-left-color:var(--amber);}
+  .card-top{
+    display:flex; justify-content:space-between; align-items:flex-start; gap:10px;
+  }
+  .tag{
+    font-size:10.5px;
+    font-weight:800;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    padding:3px 8px;
+    border-radius:3px;
+    background:var(--blue);
+    color:var(--white);
+  }
+  .card.need .tag{background:var(--amber);}
+  .card-zone{font-size:12.5px; color:#6b7590; font-weight:600;}
+  .card-desc{margin:10px 0 8px; font-size:14.5px; line-height:1.5;}
+  .card-meta{
+    font-size:12.5px; color:#54607a;
+    display:flex; gap:14px; flex-wrap:wrap;
+    border-top:1px dashed var(--line);
+    padding-top:9px; margin-top:8px;
+  }
+  .card-meta span b{color:var(--blue-deep);}
+  .empty{
+    text-align:center; padding:40px 20px; color:#9aa3b8;
+    font-size:13.5px;
+  }
+  footer{
+    text-align:center;
+    font-size:12px; color:#8a95ab; margin-top:20px; line-height:1.8;
+  }
+  footer .line1{ font-weight:600; }
+  footer .line2{ font-size:11px; margin-top:2px; }
+  .notice{
+    font-size:12px; color:#6b7590; margin-top:10px; line-height:1.5;
+  }
+</style>
+</head>
+<body>
+<div class="flagbar"><span class="b"></span><span class="r"></span><span class="w"></span><span class="r"></span><span class="g"></span></div>
+<div class="wrap">
+
+  <header>
+    <div class="badge-row">
+      <svg class="heart-icon" width="30" height="30" viewBox="0 0 24 24" fill="none">
+        <path d="M12 21s-7.5-4.6-10-9.3C0.3 8.2 2 4.5 5.6 4c2-.3 3.7.6 4.9 2.2C11.7 4.6 13.4 3.7 15.4 4c3.6.5 5.3 4.2 3.6 7.7C16.5 16.4 12 21 12 21z" fill="#CE1126"/>
+      </svg>
+      <div>
+        <div class="eyebrow">Inventario comunitario · vivienda temporal</div>
+      </div>
+    </div>
+    <h1>Red de Vivienda Solidaria</h1>
+    <div class="slogan">Cali te acoge</div>
+    <p class="sub">Un lugar <b>100% gratuito</b> para saber, en tiempo real, con qué espacios cuenta la ciudad: quién tiene un cuarto, un apartamento o una casa disponible, y quién la necesita mientras se recupera.</p>
+    <div class="stats">
+      <div class="stat"><b id="statOffers">0</b>Ofertas activas</div>
+      <div class="stat g"><b id="statNeeds">0</b>Familias buscando</div>
+    </div>
+  </header>
+
+  <div class="panel">
+    <h2>Publicar</h2>
+    <div class="toggle">
+      <button id="btnOffer" class="active offer" onclick="setMode('offer')">Ofrezco espacio</button>
+      <button id="btnNeed" onclick="setMode('need')">Necesito espacio</button>
+    </div>
+
+    <div class="row2">
+      <div>
+        <label>Contacto (nombre, WhatsApp o teléfono)</label>
+        <input id="fName" placeholder="Ej: María — 300 000 0000">
+      </div>
+      <div>
+        <label>Zona</label>
+        <select id="fZoneGen">
+          <option value="">Selecciona zona</option>
+          <option value="Norte">Norte</option>
+          <option value="Sur">Sur</option>
+          <option value="Oriente">Oriente</option>
+          <option value="Occidente / Ladera">Occidente / Ladera</option>
+          <option value="Centro">Centro</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row2">
+      <div>
+        <label>Barrio (opcional, más detalle)</label>
+        <input id="fZone" placeholder="Ej: San Fernando">
+      </div>
+      <div id="spaceTypeWrap">
+        <label id="spaceTypeLabel">Tipo de espacio</label>
+        <select id="fSpaceType">
+          <option value="Cuarto">Cuarto</option>
+          <option value="Apartamento">Apartamento</option>
+          <option value="Casa">Casa</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row2">
+      <div id="modalityWrap">
+        <label id="modalityLabel">Modalidad</label>
+        <select id="fModality" onchange="toggleValueField()">
+          <option value="Préstamo temporal">Préstamo temporal (sin costo)</option>
+          <option value="Alquiler">Alquiler</option>
+          <option value="Compartir cuarto">Compartir cuarto / espacio</option>
+        </select>
+      </div>
+      <div>
+        <label id="durationLabel">Disponible por</label>
+        <input id="fDuration" placeholder="Ej: 1 mes, 2 meses, indefinido">
+      </div>
+    </div>
+
+    <div class="row2" id="furnishedWrap">
+      <div>
+        <label>¿Amoblado?</label>
+        <select id="fFurnished">
+          <option value="">No especifica</option>
+          <option value="Amoblado">Amoblado</option>
+          <option value="Sin amoblar">Sin amoblar</option>
+        </select>
+      </div>
+      <div></div>
+    </div>
+
+    <div class="row2" id="valueWrap" style="display:none;">
+      <div>
+        <label>Precio del arriendo (COP/mes)</label>
+        <input id="fValue" type="number" placeholder="Ej: 800000">
+      </div>
+      <div></div>
+    </div>
+
+    <label id="descLabel">Descripción del espacio</label>
+    <textarea id="fDesc" placeholder="Ej: Cuarto independiente, para 2 personas, con baño. Disponible desde ya."></textarea>
+
+    <label>Enlace a fotos (opcional)</label>
+    <input id="fPhotos" placeholder="Ej: link de Google Drive con fotos del espacio">
+
+    <button class="submit" onclick="publish()">Publicar</button>
+    <p class="notice">Esta información es visible para cualquier persona que abra este enlace, así que solo comparte lo que quieras hacer público.</p>
+  </div>
+
+  <div class="panel">
+    <h2>Lo que hay disponible</h2>
+    <div class="chiprow">
+      <div class="chip active" data-f="all" onclick="setFilter('all')">Todo</div>
+      <div class="chip" data-f="offer" onclick="setFilter('offer')">Ofertas</div>
+      <div class="chip" data-f="need" onclick="setFilter('need')">Necesidades</div>
+      <div class="chip" id="chipFree" onclick="toggleFreeFilter()">Sin costo</div>
+    </div>
+    <div class="filters">
+      <select id="fltSpaceType" onchange="filterChanged()">
+        <option value="">Cualquier tipo</option>
+        <option value="Cuarto">Cuarto</option>
+        <option value="Apartamento">Apartamento</option>
+        <option value="Casa">Casa</option>
+      </select>
+      <select id="fltZone" onchange="filterChanged()">
+        <option value="">Cualquier zona</option>
+        <option value="Norte">Norte</option>
+        <option value="Sur">Sur</option>
+        <option value="Oriente">Oriente</option>
+        <option value="Occidente / Ladera">Occidente / Ladera</option>
+        <option value="Centro">Centro</option>
+      </select>
+      <input id="fltMaxValue" class="full" type="number" placeholder="Si buscas arriendo: precio máximo (COP)" oninput="filterChanged()">
+    </div>
+    <div id="list"></div>
+  </div>
+
+  <footer>
+    <div class="line1">Herramienta gratuita y solidaria — sin fines comerciales</div>
+    <div class="line2">@cameya.co</div>
+  </footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// ======= PEGA AQUÍ TUS DATOS DE SUPABASE (paso 3 de las instrucciones) =======
+const SUPABASE_URL = "https://srrsxflhzpfaiihxvgjx.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNycnN4ZmxoenBmYWlpaHh2Z2p4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY1NjQxMzIsImV4cCI6MjEwMjE0MDEzMn0.sZPavGJb26ngIToh4iMrblr4fWC-j6A-AL5U6W45-9Y";
+// ================================================================================
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let mode = 'offer';
+let filter = 'all';
+let freeOnly = false;
+let entries = [];
+let visibleCount = 20;
+const PAGE_SIZE = 20;
+
+function toggleFreeFilter(){
+  freeOnly = !freeOnly;
+  visibleCount = PAGE_SIZE;
+  document.getElementById('chipFree').classList.toggle('active', freeOnly);
+  render();
+}
+
+function setMode(m){
+  mode = m;
+  document.getElementById('btnOffer').classList.toggle('active', m==='offer');
+  document.getElementById('btnOffer').classList.toggle('offer', m==='offer');
+  document.getElementById('btnNeed').classList.toggle('active', m==='need');
+  document.getElementById('btnNeed').classList.toggle('need', m==='need');
+  document.getElementById('modalityLabel').textContent = m==='offer' ? 'Modalidad' : 'Modalidad que busca';
+  document.getElementById('spaceTypeLabel').textContent = m==='offer' ? 'Tipo de espacio' : 'Tipo de espacio que busca';
+  document.getElementById('durationLabel').textContent = m==='offer' ? 'Disponible por' : 'Tiempo que lo necesita';
+  document.getElementById('descLabel').textContent = m==='offer' ? 'Descripción del espacio' : 'Descripción de la necesidad';
+  document.getElementById('fDesc').placeholder = m==='offer'
+    ? "Ej: Cuarto independiente, para 2 personas, con baño. Disponible desde ya."
+    : "Ej: Familia de 3 personas, con un niño pequeño, necesita cuarto o casa temporal.";
+  document.getElementById('furnishedWrap').style.display = m==='offer' ? 'grid' : 'none';
+}
+
+function toggleValueField(){
+  const modality = document.getElementById('fModality').value;
+  document.getElementById('valueWrap').style.display = modality === 'Alquiler' ? 'grid' : 'none';
+}
+
+function filterChanged(){
+  visibleCount = PAGE_SIZE;
+  render();
+}
+
+function setFilter(f){
+  filter = f;
+  visibleCount = PAGE_SIZE;
+  document.querySelectorAll('.chip').forEach(c=>c.classList.toggle('active', c.dataset.f===f));
+  render();
+}
+
+async function loadEntries(){
+  try{
+    const { data, error } = await supabaseClient.from('entries').select('*').order('date', { ascending:false });
+    if(error) throw error;
+    entries = (data || []).map(row => ({
+      id: row.id, type: row.type, name: row.name,
+      zoneGen: row.zonegen, zone: row.zone, spaceType: row.spacetype,
+      modality: row.modality, duration: row.duration, value: row.value,
+      furnished: row.furnished,
+      desc: row.description, photos: row.photos, date: row.date
+    }));
+  }catch(e){
+    console.error('Error cargando publicaciones:', e);
+    entries = [];
+  }
+  render();
+}
+
+async function publish(){
+  const name = document.getElementById('fName').value.trim();
+  const zoneGen = document.getElementById('fZoneGen').value;
+  const zone = document.getElementById('fZone').value.trim();
+  const spaceType = document.getElementById('fSpaceType').value;
+  const modality = document.getElementById('fModality').value;
+  const duration = document.getElementById('fDuration').value.trim();
+  const value = document.getElementById('fValue').value.trim();
+  const furnished = document.getElementById('fFurnished').value;
+  const desc = document.getElementById('fDesc').value.trim();
+  const photos = document.getElementById('fPhotos').value.trim();
+
+  if(!name || !zoneGen || !desc){
+    alert('Por favor completa al menos contacto, zona y descripción.');
+    return;
+  }
+
+  const btn = document.querySelector('.submit');
+  btn.disabled = true;
+  btn.textContent = 'Publicando...';
+
+  const newEntry = {
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2,6),
+    type: mode,
+    name,
+    zonegen: zoneGen,
+    zone,
+    spacetype: spaceType,
+    modality,
+    duration,
+    value: modality === 'Alquiler' ? value : '',
+    furnished: mode === 'offer' ? furnished : '',
+    description: desc,
+    photos,
+    date: new Date().toISOString()
+  };
+
+  try{
+    const { error } = await supabaseClient.from('entries').insert(newEntry);
+    if(error) throw error;
+    document.getElementById('fName').value='';
+    document.getElementById('fZoneGen').value='';
+    document.getElementById('fZone').value='';
+    document.getElementById('fDuration').value='';
+    document.getElementById('fValue').value='';
+    document.getElementById('fFurnished').value='';
+    document.getElementById('fDesc').value='';
+    document.getElementById('fPhotos').value='';
+    await loadEntries();
+  }catch(e){
+    console.error('Error publicando:', e);
+    alert('No se pudo publicar. Revisa tu conexión a Supabase e intenta de nuevo.');
+  }finally{
+    btn.disabled = false;
+    btn.textContent = 'Publicar';
+  }
+}
+
+function render(){
+  document.getElementById('statOffers').textContent = entries.filter(e=>e.type==='offer').length;
+  document.getElementById('statNeeds').textContent = entries.filter(e=>e.type==='need').length;
+
+  const fSpaceType = document.getElementById('fltSpaceType').value;
+  const fZone = document.getElementById('fltZone').value;
+  const fMaxValue = parseFloat(document.getElementById('fltMaxValue').value);
+
+  let shown = filter==='all' ? entries : entries.filter(e=>e.type===filter);
+  if(freeOnly) shown = shown.filter(e=>e.modality==='Préstamo temporal');
+  if(fSpaceType) shown = shown.filter(e=>e.spaceType===fSpaceType);
+  if(fZone) shown = shown.filter(e=>e.zoneGen===fZone);
+  if(!isNaN(fMaxValue)) shown = shown.filter(e=> !e.value || parseFloat(e.value) <= fMaxValue);
+
+  const list = document.getElementById('list');
+
+  if(shown.length===0){
+    list.innerHTML = '<div class="empty">No hay publicaciones que coincidan con estos filtros.</div>';
+    return;
+  }
+
+  const toDisplay = shown.slice(0, visibleCount);
+
+  list.innerHTML = toDisplay.map(e => `
+    <div class="card ${e.type}">
+      <div class="card-top">
+        <span class="tag">${e.type==='offer' ? 'Ofrece espacio' : 'Necesita espacio'}</span>
+        <span class="card-zone">${escapeHtml(e.zoneGen || '')}${e.zone ? ' · ' + escapeHtml(e.zone) : ''}</span>
+      </div>
+      <p class="card-desc">${escapeHtml(e.desc)}</p>
+      ${e.photos ? `<p class="card-desc"><a href="${escapeHtml(e.photos)}" target="_blank" rel="noopener" style="color:var(--blue-deep); font-weight:700;">Ver fotos →</a></p>` : ''}
+      <div class="card-meta">
+        <span><b>${escapeHtml(e.name)}</b></span>
+        ${e.spaceType ? `<span>${escapeHtml(e.spaceType)}</span>` : ''}
+        ${e.modality ? `<span>${escapeHtml(e.modality)}</span>` : ''}
+        ${e.furnished ? `<span>${escapeHtml(e.furnished)}</span>` : ''}
+        ${e.value ? `<span>$${escapeHtml(e.value)}/mes</span>` : ''}
+        ${e.duration ? `<span>${escapeHtml(e.duration)}</span>` : ''}
+      </div>
+      <div style="margin-top:10px; text-align:right;">
+        <a href="#" onclick="removeEntry('${e.id}'); return false;" style="font-size:11.5px; color:#9aa3b8; text-decoration:underline;">Ya no disponible — eliminar</a>
+      </div>
+    </div>
+  `).join('');
+
+  if(shown.length > visibleCount){
+    list.innerHTML += `<button onclick="loadMore()" style="width:100%; padding:11px; margin-top:6px; background:var(--paper); border:1px solid var(--line); border-radius:4px; font-weight:700; font-size:13.5px; color:var(--blue-deep); cursor:pointer;">Mostrar más (${shown.length - visibleCount} restantes)</button>`;
+  }
+}
+
+function loadMore(){
+  visibleCount += PAGE_SIZE;
+  render();
+}
+
+async function removeEntry(id){
+  if(!confirm('¿Seguro que quieres eliminar esta publicación? No se puede deshacer.')) return;
+  try{
+    const { error } = await supabaseClient.from('entries').delete().eq('id', id);
+    if(error) throw error;
+    await loadEntries();
+  }catch(e){
+    console.error('Error eliminando:', e);
+    alert('No se pudo eliminar. Intenta de nuevo.');
+  }
+}
+
+function escapeHtml(s){
+  const d = document.createElement('div');
+  d.textContent = s || '';
+  return d.innerHTML;
+}
+
+loadEntries();
+</script>
+</body>
+</html>
