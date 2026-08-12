@@ -381,7 +381,10 @@
       </select>
       <input id="fltMaxValue" class="full" type="text" inputmode="numeric" placeholder="Si buscas arriendo: precio máximo (COP)" oninput="formatPriceInput(this)" onkeydown="if(event.key==='Enter'){filterChanged();}">
     </div>
-    <button class="submit" style="margin-top:0; margin-bottom:16px;" onclick="filterChanged()">Buscar</button>
+    <div style="display:flex; gap:8px; margin-bottom:16px;">
+      <button class="submit" style="margin-top:0;" onclick="filterChanged()">Buscar</button>
+      <button onclick="clearFilters()" style="flex:0 0 auto; padding:13px 16px; background:var(--paper); border:1px solid var(--line); border-radius:4px; font-weight:700; font-size:13.5px; color:#6b7590; cursor:pointer;">Limpiar</button>
+    </div>
     <div id="list"></div>
   </div>
 
@@ -437,6 +440,15 @@ function toggleValueField(){
 function formatPriceInput(el){
   const digits = el.value.replace(/\D/g, '');
   el.value = digits ? Number(digits).toLocaleString('es-CO') : '';
+}
+
+function clearFilters(){
+  document.getElementById('fltSpaceType').value = '';
+  document.getElementById('fltZone').value = '';
+  document.getElementById('fltMaxValue').value = '';
+  freeOnly = false;
+  document.getElementById('chipFree').classList.remove('active');
+  setFilter('all');
 }
 
 function filterChanged(){
