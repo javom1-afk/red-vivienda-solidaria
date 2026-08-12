@@ -202,6 +202,17 @@
   }
   .card.need .tag{background:var(--amber);}
   .card-zone{font-size:12.5px; color:#6b7590; font-weight:600;}
+  .card-contact{
+    font-size:14px; font-weight:800; color:var(--blue-deep);
+    margin-top:8px;
+  }
+  .card-contact .lbl{ font-weight:600; color:#6b7590; text-transform:uppercase; font-size:10.5px; letter-spacing:.04em; margin-right:6px; }
+  .card-highlights{ display:flex; flex-wrap:wrap; gap:6px; margin-top:9px; }
+  .hl-pill{
+    background:var(--paper); border:1px solid var(--line); border-radius:4px;
+    padding:4px 9px; font-size:12px; font-weight:700; color:var(--ink);
+  }
+  .hl-pill.free{ background:#e7f6ec; border-color:#bfe6cb; color:var(--green-deep); }
   .card-desc{margin:10px 0 8px; font-size:14.5px; line-height:1.5;}
   .card-meta{
     font-size:12.5px; color:#54607a;
@@ -526,16 +537,17 @@ function render(){
         <span class="tag">${e.type==='offer' ? 'Ofrece espacio' : 'Necesita espacio'}</span>
         <span class="card-zone">${escapeHtml(e.zoneGen || '')}${e.zone ? ' · ' + escapeHtml(e.zone) : ''}</span>
       </div>
+      <div class="card-contact"><span class="lbl">Contacto</span>${escapeHtml(e.name)}</div>
+      <div class="card-highlights">
+        ${e.spaceType ? `<span class="hl-pill">${escapeHtml(e.spaceType)}</span>` : ''}
+        ${e.furnished ? `<span class="hl-pill">${escapeHtml(e.furnished)}</span>` : ''}
+        ${e.modality==='Préstamo temporal' ? `<span class="hl-pill free">Gratis</span>` : (e.modality ? `<span class="hl-pill">${escapeHtml(e.modality)}</span>` : '')}
+        ${e.value ? `<span class="hl-pill">$${escapeHtml(e.value)}/mes</span>` : ''}
+        ${(e.zoneGen || e.zone) ? `<span class="hl-pill">${escapeHtml(e.zoneGen || '')}${e.zone ? ' · ' + escapeHtml(e.zone) : ''}</span>` : ''}
+        ${e.duration ? `<span class="hl-pill">${escapeHtml(e.duration)}</span>` : ''}
+      </div>
       <p class="card-desc">${escapeHtml(e.desc)}</p>
       ${e.photos ? `<p class="card-desc"><a href="${escapeHtml(e.photos)}" target="_blank" rel="noopener" style="color:var(--blue-deep); font-weight:700;">Ver fotos →</a></p>` : ''}
-      <div class="card-meta">
-        <span><b>${escapeHtml(e.name)}</b></span>
-        ${e.spaceType ? `<span>${escapeHtml(e.spaceType)}</span>` : ''}
-        ${e.modality ? `<span>${escapeHtml(e.modality)}</span>` : ''}
-        ${e.furnished ? `<span>${escapeHtml(e.furnished)}</span>` : ''}
-        ${e.value ? `<span>$${escapeHtml(e.value)}/mes</span>` : ''}
-        ${e.duration ? `<span>${escapeHtml(e.duration)}</span>` : ''}
-      </div>
       <div style="margin-top:10px; text-align:right;">
         <a href="#" onclick="removeEntry('${e.id}'); return false;" style="font-size:11.5px; color:#9aa3b8; text-decoration:underline;">Ya no disponible — eliminar</a>
       </div>
