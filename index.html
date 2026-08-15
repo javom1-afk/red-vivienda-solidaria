@@ -84,7 +84,9 @@
     padding:8px 14px;
     font-size:13px;
     color:var(--blue-deep);
+    transition: transform .08s ease;
   }
+  .stat:active{ transform: scale(0.95); }
   .stat.g{ border-top-color:var(--green); color:var(--green-deep); }
   .stat b{font-size:19px; display:block; font-weight:800;}
 
@@ -282,7 +284,7 @@
     <div class="slogan">Un techo en Cali · Encuentra tu vivienda</div>
     <p class="sub">Publica o encuentra cuartos, apartamentos y casas disponibles en la ciudad: en alquiler, en préstamo o para compartir. Toda la oferta y la demanda de vivienda de Cali en un solo lugar.</p>
     <div class="stats">
-      <div class="stat"><b id="statOffers">0</b>Ofertas activas</div>
+      <div class="stat" id="statOffersBtn" onclick="goToOffers()" style="cursor:pointer;"><b id="statOffers">0</b>Ofertas activas</div>
       <div class="stat g"><b id="statNeeds">0</b>Familias buscando</div>
     </div>
   </header>
@@ -321,9 +323,9 @@
       <div id="spaceTypeWrap">
         <label id="spaceTypeLabel">Tipo de espacio</label>
         <select id="fSpaceType">
-          <option value="Cuarto">Cuarto</option>
           <option value="Apartamento">Apartamento</option>
           <option value="Casa">Casa</option>
+          <option value="Cuarto">Cuarto</option>
         </select>
       </div>
     </div>
@@ -332,14 +334,14 @@
       <div id="modalityWrap">
         <label id="modalityLabel">Modalidad</label>
         <select id="fModality" onchange="toggleValueField()">
-          <option value="Préstamo temporal">Préstamo temporal (sin costo)</option>
           <option value="Alquiler">Alquiler</option>
+          <option value="Préstamo temporal">Préstamo temporal (sin costo)</option>
           <option value="Compartir cuarto">Compartir cuarto / espacio</option>
         </select>
       </div>
       <div>
         <label id="durationLabel">Disponible por</label>
-        <input id="fDuration" placeholder="Ej: 1 mes, 2 meses, indefinido">
+        <input id="fDuration" value="6 meses" placeholder="Ej: 1 mes, 2 meses, indefinido">
       </div>
     </div>
 
@@ -355,12 +357,43 @@
       <div></div>
     </div>
 
-    <div class="row2" id="valueWrap" style="display:none;">
+    <div class="row2" id="valueWrap">
       <div>
         <label>Precio del arriendo (COP/mes)</label>
         <input id="fValue" type="number" placeholder="Ej: 800000">
       </div>
       <div></div>
+    </div>
+
+    <div class="row2" id="detailsWrap">
+      <div>
+        <label>Habitaciones (opcional)</label>
+        <input id="fBedrooms" type="number" min="0" placeholder="Ej: 2">
+      </div>
+      <div>
+        <label>Baños (opcional)</label>
+        <input id="fBathrooms" type="number" min="0" placeholder="Ej: 1">
+      </div>
+    </div>
+    <div class="row2" id="detailsWrap2">
+      <div>
+        <label>Área en m² (opcional)</label>
+        <input id="fArea" type="number" min="0" placeholder="Ej: 45">
+      </div>
+      <div>
+        <label>Comodidades (opcional)</label>
+        <div style="display:flex; gap:14px; flex-wrap:wrap; padding-top:10px;">
+          <label style="display:flex; align-items:center; gap:5px; font-size:13px; font-weight:600; color:var(--ink); cursor:pointer;">
+            <input type="checkbox" id="fParking"> Parqueadero
+          </label>
+          <label style="display:flex; align-items:center; gap:5px; font-size:13px; font-weight:600; color:var(--ink); cursor:pointer;">
+            <input type="checkbox" id="fPool"> Piscina
+          </label>
+          <label style="display:flex; align-items:center; gap:5px; font-size:13px; font-weight:600; color:var(--ink); cursor:pointer;">
+            <input type="checkbox" id="fElevator"> Ascensor
+          </label>
+        </div>
+      </div>
     </div>
 
     <label id="descLabel">Descripción del espacio</label>
@@ -373,7 +406,7 @@
     <p class="notice">Esta información es visible para cualquier persona que abra este enlace, así que solo comparte lo que quieras hacer público.</p>
   </div>
 
-  <div class="panel">
+  <div class="panel" id="browsePanel">
     <h2>Lo que hay disponible</h2>
 
     <button id="btnWizard" onclick="startWizard()" style="width:100%; margin-bottom:14px; padding:12px; background:var(--paper); border:2px dashed var(--blue-deep); border-radius:6px; font-weight:800; font-size:13.5px; color:var(--blue-deep); cursor:pointer;">🔍 Ayúdame a buscar</button>
@@ -421,6 +454,7 @@
         <option value="2">2+ baños</option>
         <option value="3">3+ baños</option>
       </select>
+      <input id="fltMinArea" type="number" min="0" placeholder="Área mínima (m²)" onchange="filterChanged()">
       <div class="full" style="display:flex; gap:16px; flex-wrap:wrap; padding:4px 2px;">
         <label style="display:flex; align-items:center; gap:6px; font-size:13px; font-weight:600; color:var(--ink); cursor:pointer;">
           <input type="checkbox" id="fltParking" onchange="filterChanged()"> Parqueadero
@@ -498,6 +532,16 @@ const wizardSteps = [
     ]
   },
   {
+    key: 'minArea',
+    question: '¿Qué tan grande lo necesitas?',
+    options: [
+      { label: 'Más de 30 m²', value: '30' },
+      { label: 'Más de 50 m²', value: '50' },
+      { label: 'Más de 80 m²', value: '80' },
+      { label: 'No importa el tamaño', value: '' }
+    ]
+  },
+  {
     key: 'amenities',
     question: '¿Necesitas algo de esto?',
     options: [
@@ -551,12 +595,13 @@ function applyWizardAnswers(){
   document.getElementById('fltZone').value = wizardAnswers.zone || '';
   const maxValEl = document.getElementById('fltMaxValue');
   maxValEl.value = wizardAnswers.maxValue ? Number(wizardAnswers.maxValue).toLocaleString('es-CO') : '';
+  document.getElementById('fltMinArea').value = wizardAnswers.minArea || '';
 
   const amenities = wizardAnswers.amenities || [];
   document.getElementById('fltParking').checked = amenities.includes('parking');
   document.getElementById('fltPool').checked = amenities.includes('pool');
   document.getElementById('fltElevator').checked = amenities.includes('elevator');
-  if(amenities.length > 0){
+  if(amenities.length > 0 || wizardAnswers.minArea){
     document.getElementById('advancedFilters').style.display = 'grid';
     document.getElementById('toggleAdvanced').textContent = '− Ocultar filtros avanzados';
   }
@@ -569,6 +614,11 @@ function applyWizardAnswers(){
 function closeWizard(){
   document.getElementById('wizardBox').style.display = 'none';
   document.getElementById('wizardBox').innerHTML = '';
+}
+
+function goToOffers(){
+  document.getElementById('browsePanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  setFilter('offer');
 }
 
 function toggleFreeFilter(){
@@ -592,6 +642,8 @@ function setMode(m){
     ? "Ej: Cuarto independiente, para 2 personas, con baño. Disponible desde ya."
     : "Ej: Familia de 3 personas, con un niño pequeño, necesita cuarto o casa temporal.";
   document.getElementById('furnishedWrap').style.display = m==='offer' ? 'grid' : 'none';
+  document.getElementById('detailsWrap').style.display = m==='offer' ? 'grid' : 'none';
+  document.getElementById('detailsWrap2').style.display = m==='offer' ? 'grid' : 'none';
 }
 
 function toggleValueField(){
@@ -619,6 +671,7 @@ function clearFilters(){
   document.getElementById('fltMaxValue').value = '';
   document.getElementById('fltBedrooms').value = '';
   document.getElementById('fltBathrooms').value = '';
+  document.getElementById('fltMinArea').value = '';
   document.getElementById('fltParking').checked = false;
   document.getElementById('fltPool').checked = false;
   document.getElementById('fltElevator').checked = false;
@@ -649,7 +702,7 @@ async function loadEntries(){
       modality: row.modality, duration: row.duration, value: row.value,
       furnished: row.furnished, status: row.status || 'active',
       source: row.source || 'community',
-      bedrooms: row.bedrooms, bathrooms: row.bathrooms, floor: row.floor,
+      bedrooms: row.bedrooms, bathrooms: row.bathrooms, floor: row.floor, area: row.area,
       parking: row.parking, pool: row.pool, elevator: row.elevator,
       desc: row.description, photos: row.photos, date: row.date
     }));
@@ -669,6 +722,12 @@ async function publish(){
   const duration = document.getElementById('fDuration').value.trim();
   const value = document.getElementById('fValue').value.trim();
   const furnished = document.getElementById('fFurnished').value;
+  const bedrooms = document.getElementById('fBedrooms').value.trim();
+  const bathrooms = document.getElementById('fBathrooms').value.trim();
+  const area = document.getElementById('fArea').value.trim();
+  const parking = document.getElementById('fParking').checked;
+  const pool = document.getElementById('fPool').checked;
+  const elevator = document.getElementById('fElevator').checked;
   const desc = document.getElementById('fDesc').value.trim();
   const photos = document.getElementById('fPhotos').value.trim();
 
@@ -694,6 +753,12 @@ async function publish(){
     furnished: mode === 'offer' ? furnished : '',
     status: 'active',
     source: 'community',
+    bedrooms: mode === 'offer' ? bedrooms : '',
+    bathrooms: mode === 'offer' ? bathrooms : '',
+    area: mode === 'offer' ? area : '',
+    parking: mode === 'offer' && parking ? 'SI' : '',
+    pool: mode === 'offer' && pool ? 'SI' : '',
+    elevator: mode === 'offer' && elevator ? 'SI' : '',
     description: desc,
     photos,
     date: new Date().toISOString()
@@ -705,9 +770,15 @@ async function publish(){
     document.getElementById('fName').value='';
     document.getElementById('fZoneGen').value='';
     document.getElementById('fZone').value='';
-    document.getElementById('fDuration').value='';
+    document.getElementById('fDuration').value='6 meses';
     document.getElementById('fValue').value='';
     document.getElementById('fFurnished').value='';
+    document.getElementById('fBedrooms').value='';
+    document.getElementById('fBathrooms').value='';
+    document.getElementById('fArea').value='';
+    document.getElementById('fParking').checked=false;
+    document.getElementById('fPool').checked=false;
+    document.getElementById('fElevator').checked=false;
     document.getElementById('fDesc').value='';
     document.getElementById('fPhotos').value='';
     await loadEntries();
@@ -730,6 +801,7 @@ function render(){
   const fMaxValue = fMaxValueRaw ? parseFloat(fMaxValueRaw) : NaN;
   const fBedrooms = parseInt(document.getElementById('fltBedrooms').value) || 0;
   const fBathrooms = parseInt(document.getElementById('fltBathrooms').value) || 0;
+  const fMinArea = parseInt(document.getElementById('fltMinArea').value) || 0;
   const fParking = document.getElementById('fltParking').checked;
   const fPool = document.getElementById('fltPool').checked;
   const fElevator = document.getElementById('fltElevator').checked;
@@ -744,6 +816,7 @@ function render(){
   if(!isNaN(fMaxValue)) shown = shown.filter(e=> !e.value || parseFloat(e.value) <= fMaxValue);
   if(fBedrooms) shown = shown.filter(e=> !e.bedrooms || parseInt(e.bedrooms) >= fBedrooms);
   if(fBathrooms) shown = shown.filter(e=> !e.bathrooms || parseInt(e.bathrooms) >= fBathrooms);
+  if(fMinArea) shown = shown.filter(e=> !e.area || parseInt(e.area) >= fMinArea);
   if(fParking) shown = shown.filter(e=> e.parking === 'SI');
   if(fPool) shown = shown.filter(e=> e.pool === 'SI');
   if(fElevator) shown = shown.filter(e=> e.elevator === 'SI');
@@ -773,6 +846,7 @@ function render(){
         ${e.value ? `<span class="hl-pill">$${escapeHtml(e.value)}/mes</span>` : ''}
         ${(e.zoneGen || e.zone) ? `<span class="hl-pill">${escapeHtml(e.zoneGen || '')}${e.zone ? ' · ' + escapeHtml(e.zone) : ''}</span>` : ''}
         ${e.duration ? `<span class="hl-pill">${escapeHtml(e.duration)}</span>` : ''}
+        ${e.area ? `<span class="hl-pill">${escapeHtml(String(e.area))} m²</span>` : ''}
         ${e.bedrooms ? `<span class="hl-pill">${escapeHtml(String(e.bedrooms))} hab.</span>` : ''}
         ${e.bathrooms ? `<span class="hl-pill">${escapeHtml(String(e.bathrooms))} baños</span>` : ''}
         ${e.floor ? `<span class="hl-pill">Piso ${escapeHtml(String(e.floor))}</span>` : ''}
