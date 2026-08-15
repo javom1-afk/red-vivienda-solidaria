@@ -390,6 +390,35 @@
       </select>
       <input id="fltMaxValue" class="full" type="text" inputmode="numeric" placeholder="Si buscas arriendo: precio máximo (COP)" oninput="formatPriceInput(this)" onkeydown="if(event.key==='Enter'){filterChanged();}">
     </div>
+
+    <a href="#" id="toggleAdvanced" onclick="toggleAdvancedFilters(); return false;" style="display:block; font-size:12.5px; font-weight:700; color:var(--blue-deep); margin-bottom:10px;">+ Más filtros (habitaciones, baños, parqueadero, piscina, ascensor)</a>
+
+    <div class="filters" id="advancedFilters" style="display:none;">
+      <select id="fltBedrooms" onchange="filterChanged()">
+        <option value="">Habitaciones (cualquiera)</option>
+        <option value="1">1+ habitación</option>
+        <option value="2">2+ habitaciones</option>
+        <option value="3">3+ habitaciones</option>
+        <option value="4">4+ habitaciones</option>
+      </select>
+      <select id="fltBathrooms" onchange="filterChanged()">
+        <option value="">Baños (cualquiera)</option>
+        <option value="1">1+ baño</option>
+        <option value="2">2+ baños</option>
+        <option value="3">3+ baños</option>
+      </select>
+      <div class="full" style="display:flex; gap:16px; flex-wrap:wrap; padding:4px 2px;">
+        <label style="display:flex; align-items:center; gap:6px; font-size:13px; font-weight:600; color:var(--ink); cursor:pointer;">
+          <input type="checkbox" id="fltParking" onchange="filterChanged()"> Parqueadero
+        </label>
+        <label style="display:flex; align-items:center; gap:6px; font-size:13px; font-weight:600; color:var(--ink); cursor:pointer;">
+          <input type="checkbox" id="fltPool" onchange="filterChanged()"> Piscina
+        </label>
+        <label style="display:flex; align-items:center; gap:6px; font-size:13px; font-weight:600; color:var(--ink); cursor:pointer;">
+          <input type="checkbox" id="fltElevator" onchange="filterChanged()"> Ascensor
+        </label>
+      </div>
+    </div>
     <div style="display:flex; gap:8px; margin-bottom:16px;">
       <button class="submit" style="margin-top:0;" onclick="filterChanged()">Buscar</button>
       <button onclick="clearFilters()" style="flex:0 0 auto; padding:13px 16px; background:var(--paper); border:1px solid var(--line); border-radius:4px; font-weight:700; font-size:13.5px; color:#6b7590; cursor:pointer;">Limpiar</button>
@@ -446,6 +475,15 @@ function toggleValueField(){
   document.getElementById('valueWrap').style.display = modality === 'Alquiler' ? 'grid' : 'none';
 }
 
+function toggleAdvancedFilters(){
+  const box = document.getElementById('advancedFilters');
+  const isHidden = box.style.display === 'none';
+  box.style.display = isHidden ? 'grid' : 'none';
+  document.getElementById('toggleAdvanced').textContent = isHidden
+    ? '− Ocultar filtros avanzados'
+    : '+ Más filtros (habitaciones, baños, parqueadero, piscina, ascensor)';
+}
+
 function formatPriceInput(el){
   const digits = el.value.replace(/\D/g, '');
   el.value = digits ? Number(digits).toLocaleString('es-CO') : '';
@@ -455,6 +493,11 @@ function clearFilters(){
   document.getElementById('fltSpaceType').value = '';
   document.getElementById('fltZone').value = '';
   document.getElementById('fltMaxValue').value = '';
+  document.getElementById('fltBedrooms').value = '';
+  document.getElementById('fltBathrooms').value = '';
+  document.getElementById('fltParking').checked = false;
+  document.getElementById('fltPool').checked = false;
+  document.getElementById('fltElevator').checked = false;
   freeOnly = false;
   document.getElementById('chipFree').classList.remove('active');
   setFilter('all');
@@ -482,6 +525,8 @@ async function loadEntries(){
       modality: row.modality, duration: row.duration, value: row.value,
       furnished: row.furnished, status: row.status || 'active',
       source: row.source || 'community',
+      bedrooms: row.bedrooms, bathrooms: row.bathrooms, floor: row.floor,
+      parking: row.parking, pool: row.pool, elevator: row.elevator,
       desc: row.description, photos: row.photos, date: row.date
     }));
   }catch(e){
@@ -559,6 +604,11 @@ function render(){
   const fZone = document.getElementById('fltZone').value;
   const fMaxValueRaw = document.getElementById('fltMaxValue').value.replace(/\D/g, '');
   const fMaxValue = fMaxValueRaw ? parseFloat(fMaxValueRaw) : NaN;
+  const fBedrooms = parseInt(document.getElementById('fltBedrooms').value) || 0;
+  const fBathrooms = parseInt(document.getElementById('fltBathrooms').value) || 0;
+  const fParking = document.getElementById('fltParking').checked;
+  const fPool = document.getElementById('fltPool').checked;
+  const fElevator = document.getElementById('fltElevator').checked;
 
   let shown;
   if(filter==='agency') shown = entries.filter(e=>e.source==='agency');
@@ -568,6 +618,11 @@ function render(){
   if(fSpaceType) shown = shown.filter(e=>e.spaceType===fSpaceType);
   if(fZone) shown = shown.filter(e=>e.zoneGen===fZone);
   if(!isNaN(fMaxValue)) shown = shown.filter(e=> !e.value || parseFloat(e.value) <= fMaxValue);
+  if(fBedrooms) shown = shown.filter(e=> !e.bedrooms || parseInt(e.bedrooms) >= fBedrooms);
+  if(fBathrooms) shown = shown.filter(e=> !e.bathrooms || parseInt(e.bathrooms) >= fBathrooms);
+  if(fParking) shown = shown.filter(e=> e.parking === 'SI');
+  if(fPool) shown = shown.filter(e=> e.pool === 'SI');
+  if(fElevator) shown = shown.filter(e=> e.elevator === 'SI');
 
   const list = document.getElementById('list');
 
@@ -594,6 +649,12 @@ function render(){
         ${e.value ? `<span class="hl-pill">$${escapeHtml(e.value)}/mes</span>` : ''}
         ${(e.zoneGen || e.zone) ? `<span class="hl-pill">${escapeHtml(e.zoneGen || '')}${e.zone ? ' · ' + escapeHtml(e.zone) : ''}</span>` : ''}
         ${e.duration ? `<span class="hl-pill">${escapeHtml(e.duration)}</span>` : ''}
+        ${e.bedrooms ? `<span class="hl-pill">${escapeHtml(String(e.bedrooms))} hab.</span>` : ''}
+        ${e.bathrooms ? `<span class="hl-pill">${escapeHtml(String(e.bathrooms))} baños</span>` : ''}
+        ${e.floor ? `<span class="hl-pill">Piso ${escapeHtml(String(e.floor))}</span>` : ''}
+        ${e.parking==='SI' ? `<span class="hl-pill">🚗 Parqueadero</span>` : ''}
+        ${e.pool==='SI' ? `<span class="hl-pill">🏊 Piscina</span>` : ''}
+        ${e.elevator==='SI' ? `<span class="hl-pill">🛗 Ascensor</span>` : ''}
       </div>
       <p class="card-desc">${escapeHtml(e.desc)}</p>
       ${e.photos ? `<p class="card-desc"><a href="${escapeHtml(e.photos)}" target="_blank" rel="noopener" style="color:var(--blue-deep); font-weight:700;">Ver fotos →</a></p>` : ''}
