@@ -187,6 +187,16 @@
   .chip:active{ transform: scale(0.93); }
   .chip.active{background:var(--blue-deep); color:var(--white); border-color:var(--blue-deep);}
   .btn-sub{ transition: transform .08s ease, background .12s ease; }
+  .amenity-pill{
+    display:flex; align-items:center; gap:5px;
+    font-size:12px; font-weight:600; color:var(--ink);
+    cursor:pointer; background:var(--paper); border:1px solid var(--line);
+    border-radius:20px; padding:6px 10px 6px 8px;
+    white-space:nowrap; flex:0 0 auto;
+  }
+  .amenity-pill input[type="checkbox"]{
+    width:15px; height:15px; margin:0; flex-shrink:0; accent-color: var(--blue-deep);
+  }
   .btn-sub:active{ transform: scale(0.96); }
 
   .card{
@@ -385,13 +395,13 @@
     <div id="amenitiesWrap" style="margin-bottom:16px;">
       <label>Comodidades (opcional)</label>
       <div style="display:flex; gap:8px; flex-wrap:wrap; padding-top:6px;">
-        <label style="display:flex; align-items:center; gap:4px; font-size:12px; font-weight:600; color:var(--ink); cursor:pointer; background:var(--paper); border:1px solid var(--line); border-radius:20px; padding:6px 10px;">
+        <label class="amenity-pill">
           <input type="checkbox" id="fParking"> Parqueadero
         </label>
-        <label style="display:flex; align-items:center; gap:4px; font-size:12px; font-weight:600; color:var(--ink); cursor:pointer; background:var(--paper); border:1px solid var(--line); border-radius:20px; padding:6px 10px;">
+        <label class="amenity-pill">
           <input type="checkbox" id="fPool"> Piscina
         </label>
-        <label style="display:flex; align-items:center; gap:4px; font-size:12px; font-weight:600; color:var(--ink); cursor:pointer; background:var(--paper); border:1px solid var(--line); border-radius:20px; padding:6px 10px;">
+        <label class="amenity-pill">
           <input type="checkbox" id="fElevator"> Ascensor
         </label>
       </div>
@@ -457,13 +467,13 @@
       </select>
       <input id="fltMinArea" type="number" min="0" placeholder="Área mínima (m²)" onchange="filterChanged()">
       <div class="full" style="display:flex; gap:8px; flex-wrap:wrap; padding:4px 2px;">
-        <label style="display:flex; align-items:center; gap:4px; font-size:12px; font-weight:600; color:var(--ink); cursor:pointer; background:var(--white); border:1px solid var(--line); border-radius:20px; padding:6px 10px;">
+        <label class="amenity-pill">
           <input type="checkbox" id="fltParking" onchange="filterChanged()"> Parqueadero
         </label>
-        <label style="display:flex; align-items:center; gap:4px; font-size:12px; font-weight:600; color:var(--ink); cursor:pointer; background:var(--white); border:1px solid var(--line); border-radius:20px; padding:6px 10px;">
+        <label class="amenity-pill">
           <input type="checkbox" id="fltPool" onchange="filterChanged()"> Piscina
         </label>
-        <label style="display:flex; align-items:center; gap:4px; font-size:12px; font-weight:600; color:var(--ink); cursor:pointer; background:var(--white); border:1px solid var(--line); border-radius:20px; padding:6px 10px;">
+        <label class="amenity-pill">
           <input type="checkbox" id="fltElevator" onchange="filterChanged()"> Ascensor
         </label>
       </div>
