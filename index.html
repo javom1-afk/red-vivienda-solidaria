@@ -116,7 +116,9 @@
     font-weight:700;
     border-radius:4px;
     cursor:pointer;
+    transition: transform .08s ease, background .12s ease;
   }
+  .toggle button:active{ transform: scale(0.96); }
   .toggle button.active.offer{background:var(--blue); border-color:var(--blue); color:var(--white);}
   .toggle button.active.need{background:var(--amber); border-color:var(--amber); color:var(--white);}
 
@@ -153,7 +155,10 @@
     font-size:14.5px;
     letter-spacing:.02em;
     cursor:pointer;
+    transition: transform .08s ease, background .12s ease, box-shadow .12s ease;
   }
+  .submit:hover{ background:#1a2b6e; }
+  .submit:active{ transform: scale(0.97); box-shadow: inset 0 2px 4px rgba(0,0,0,.25); }
   .submit:disabled{opacity:.5; cursor:default;}
 
   .filters{
@@ -175,8 +180,12 @@
     font-weight:700;
     cursor:pointer;
     color:#54607a;
+    transition: transform .08s ease, background .12s ease;
   }
+  .chip:active{ transform: scale(0.93); }
   .chip.active{background:var(--blue-deep); color:var(--white); border-color:var(--blue-deep);}
+  .btn-sub{ transition: transform .08s ease, background .12s ease; }
+  .btn-sub:active{ transform: scale(0.96); }
 
   .card{
     border:1px solid var(--line);
@@ -421,7 +430,7 @@
     </div>
     <div style="display:flex; gap:8px; margin-bottom:16px;">
       <button class="submit" style="margin-top:0;" onclick="filterChanged()">Buscar</button>
-      <button onclick="clearFilters()" style="flex:0 0 auto; padding:13px 16px; background:var(--paper); border:1px solid var(--line); border-radius:4px; font-weight:700; font-size:13.5px; color:#6b7590; cursor:pointer;">Limpiar</button>
+      <button class="btn-sub" onclick="clearFilters()" style="flex:0 0 auto; padding:13px 16px; background:var(--paper); border:1px solid var(--line); border-radius:4px; font-weight:700; font-size:13.5px; color:#6b7590; cursor:pointer;">Limpiar</button>
     </div>
     <div id="list"></div>
   </div>
@@ -666,7 +675,7 @@ function render(){
   `).join('');
 
   if(shown.length > visibleCount){
-    list.innerHTML += `<button onclick="loadMore()" style="width:100%; padding:11px; margin-top:6px; background:var(--paper); border:1px solid var(--line); border-radius:4px; font-weight:700; font-size:13.5px; color:var(--blue-deep); cursor:pointer;">Mostrar más (${shown.length - visibleCount} restantes)</button>`;
+    list.innerHTML += `<button class="btn-sub" onclick="loadMore()" style="width:100%; padding:11px; margin-top:6px; background:var(--paper); border:1px solid var(--line); border-radius:4px; font-weight:700; font-size:13.5px; color:var(--blue-deep); cursor:pointer;">Mostrar más (${shown.length - visibleCount} restantes)</button>`;
   }
 }
 
