@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cali Te Acoge · Red de Vivienda Solidaria</title>
+<title>Red de Vivienda Cali · Un techo en Cali</title>
 <style>
   :root{
     --blue:#0033A0;
@@ -188,6 +188,12 @@
   }
   .card.need{border-left-color:var(--amber);}
   .card.unavailable{ opacity:.55; border-left-color:#9aa3b8; }
+  .card.agency{ border-left-color:#6b7590; }
+  .agency-badge{
+    font-size:10px; font-weight:800; text-transform:uppercase;
+    color:#3a4256; letter-spacing:.04em; background:#e4e7ee;
+    padding:3px 7px; border-radius:3px;
+  }
   .status-badge{
     font-size:10px; font-weight:800; text-transform:uppercase;
     color:#6b7590; letter-spacing:.04em; background:#eceef3;
@@ -256,15 +262,16 @@
   <header>
     <div class="badge-row">
       <svg class="heart-icon" width="30" height="30" viewBox="0 0 24 24" fill="none">
-        <path d="M12 21s-7.5-4.6-10-9.3C0.3 8.2 2 4.5 5.6 4c2-.3 3.7.6 4.9 2.2C11.7 4.6 13.4 3.7 15.4 4c3.6.5 5.3 4.2 3.6 7.7C16.5 16.4 12 21 12 21z" fill="#CE1126"/>
+        <path d="M3 11.5L12 4l9 7.5" stroke="#00247D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9" stroke="#CE1126" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
       <div>
-        <div class="eyebrow">Inventario comunitario · vivienda temporal</div>
+        <div class="eyebrow">Directorio de vivienda · Cali</div>
       </div>
     </div>
-    <h1>Red de Vivienda Solidaria</h1>
-    <div class="slogan">Cali te acoge</div>
-    <p class="sub"><b>Usar esta herramienta no cuesta nada.</b> Aquí puedes ofrecer o buscar un cuarto, apartamento o casa, en préstamo, en alquiler o para compartir, y saber en tiempo real con qué espacios cuenta la ciudad.</p>
+    <h1>Red de Vivienda Cali</h1>
+    <div class="slogan">Un techo en Cali · Encuentra tu vivienda</div>
+    <p class="sub">Publica o encuentra cuartos, apartamentos y casas disponibles en la ciudad: en alquiler, en préstamo o para compartir. Toda la oferta y la demanda de vivienda de Cali en un solo lugar.</p>
     <div class="stats">
       <div class="stat"><b id="statOffers">0</b>Ofertas activas</div>
       <div class="stat g"><b id="statNeeds">0</b>Familias buscando</div>
@@ -363,6 +370,7 @@
       <div class="chip active" data-f="all" onclick="setFilter('all')">Todo</div>
       <div class="chip" data-f="offer" onclick="setFilter('offer')">Ofertas</div>
       <div class="chip" data-f="need" onclick="setFilter('need')">Necesidades</div>
+      <div class="chip" data-f="agency" onclick="setFilter('agency')">Inmobiliarias</div>
       <div class="chip" id="chipFree" onclick="toggleFreeFilter()">Sin costo</div>
     </div>
     <div class="filters">
@@ -390,7 +398,7 @@
   </div>
 
   <footer>
-    <div class="line1">Herramienta gratuita y solidaria · sin fines comerciales</div>
+    <div class="line1">Herramienta gratuita para usar · sin fines comerciales</div>
     <div class="line2">@cameya.co</div>
   </footer>
 </div>
@@ -473,6 +481,7 @@ async function loadEntries(){
       zoneGen: row.zonegen, zone: row.zone, spaceType: row.spacetype,
       modality: row.modality, duration: row.duration, value: row.value,
       furnished: row.furnished, status: row.status || 'active',
+      source: row.source || 'community',
       desc: row.description, photos: row.photos, date: row.date
     }));
   }catch(e){
@@ -515,6 +524,7 @@ async function publish(){
     value: modality === 'Alquiler' ? value : '',
     furnished: mode === 'offer' ? furnished : '',
     status: 'active',
+    source: 'community',
     description: desc,
     photos,
     date: new Date().toISOString()
@@ -550,7 +560,10 @@ function render(){
   const fMaxValueRaw = document.getElementById('fltMaxValue').value.replace(/\D/g, '');
   const fMaxValue = fMaxValueRaw ? parseFloat(fMaxValueRaw) : NaN;
 
-  let shown = filter==='all' ? entries : entries.filter(e=>e.type===filter);
+  let shown;
+  if(filter==='all') shown = entries.filter(e=>e.source!=='agency');
+  else if(filter==='agency') shown = entries.filter(e=>e.source==='agency');
+  else shown = entries.filter(e=>e.type===filter && e.source!=='agency');
   if(freeOnly) shown = shown.filter(e=>e.modality==='Préstamo temporal');
   if(fSpaceType) shown = shown.filter(e=>e.spaceType===fSpaceType);
   if(fZone) shown = shown.filter(e=>e.zoneGen===fZone);
@@ -566,11 +579,12 @@ function render(){
   const toDisplay = shown.slice(0, visibleCount);
 
   list.innerHTML = toDisplay.map(e => `
-    <div class="card ${e.type}${e.status==='unavailable' ? ' unavailable' : ''}">
+    <div class="card ${e.type}${e.status==='unavailable' ? ' unavailable' : ''}${e.source==='agency' ? ' agency' : ''}">
       <div class="card-top">
         <span class="tag">${e.type==='offer' ? 'Ofrece espacio' : 'Necesita espacio'}</span>
         <span class="card-zone">${escapeHtml(e.zoneGen || '')}${e.zone ? ' · ' + escapeHtml(e.zone) : ''}</span>
       </div>
+      ${e.source==='agency' ? '<div style="margin-top:6px;"><span class="agency-badge">Oferta inmobiliaria</span></div>' : ''}
       ${e.status==='unavailable' ? '<div style="margin-top:6px;"><span class="status-badge">No disponible</span></div>' : ''}
       <div class="card-contact"><span class="lbl">Contacto</span>${escapeHtml(e.name)}</div>
       <div class="card-highlights">
