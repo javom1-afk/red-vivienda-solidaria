@@ -598,7 +598,7 @@ function render(){
       <p class="card-desc">${escapeHtml(e.desc)}</p>
       ${e.photos ? `<p class="card-desc"><a href="${escapeHtml(e.photos)}" target="_blank" rel="noopener" style="color:var(--blue-deep); font-weight:700;">Ver fotos →</a></p>` : ''}
       <div class="card-actions">
-        <a class="link-delete" onclick="removeEntry('${e.id}')">Eliminar</a>
+        ${e.source!=='agency' ? `<a class="link-delete" onclick="removeEntry('${e.id}')">Eliminar</a>` : ''}
         <button class="btn-unavail" onclick="toggleAvailability('${e.id}', '${e.status || 'active'}')">${e.status==='unavailable' ? 'Marcar como disponible' : 'Marcar como no disponible'}</button>
       </div>
     </div>
