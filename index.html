@@ -561,9 +561,9 @@ function render(){
   const fMaxValue = fMaxValueRaw ? parseFloat(fMaxValueRaw) : NaN;
 
   let shown;
-  if(filter==='all') shown = entries.filter(e=>e.source!=='agency');
-  else if(filter==='agency') shown = entries.filter(e=>e.source==='agency');
-  else shown = entries.filter(e=>e.type===filter && e.source!=='agency');
+  if(filter==='agency') shown = entries.filter(e=>e.source==='agency');
+  else if(filter==='all') shown = entries;
+  else shown = entries.filter(e=>e.type===filter);
   if(freeOnly) shown = shown.filter(e=>e.modality==='Préstamo temporal');
   if(fSpaceType) shown = shown.filter(e=>e.spaceType===fSpaceType);
   if(fZone) shown = shown.filter(e=>e.zoneGen===fZone);
